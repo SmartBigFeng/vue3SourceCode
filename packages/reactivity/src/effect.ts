@@ -1,7 +1,8 @@
-
+import { isArray, isInteger } from '@vue/shared'
+import { TriggerOpTypes } from './operations'
 // （1） 在视图中获取数据，触发get收集effect  （2）修改数据触发set，执行effect -- 类似于watch
 // （3） 执行effect时，会触发get收集依赖，然后执行视图更新
-export function effect(fn, options: any = {}){
+export function effect(fn, options: any = {}) {
   const effect = createReactiveEffect(fn, options);
   if (!options.lazy) {
     effect()  // 立即执行
@@ -51,6 +52,7 @@ function createReactiveEffect(fn, options) {
 let targetMap = new WeakMap(); // 保存target和key的对应关系
 // 收集依赖
 export function Track(target, type, key) {
+  // console.log(target,type,key)
   // 对应的key -> key和effect一一对应  map => key = target => 属性 =》[effect]
   // 没有在effect中收集依赖，不做处理
   if (activeEffect == undefined) return
@@ -86,18 +88,38 @@ export function Trigger(target, type, key?, newValue?, oldValue?) {
   // 目标对象有没有这个属性，在Set里面找
   let effectSet = new Set();
   const add = (effectAdd) => {
-    if (effectAdd) { 
+    if (effectAdd) {
       effectAdd.forEach(effect => effectSet.add(effect))
     }
   }
   // 获取当前属性effect集合
   add(depMap.get(key))
-  effectSet.forEach((effect:any) => {
+  // console.table(depMap)
+  // 处理key === length  -> 为数组的情况
+  // 修改长度，此时key为length，newValue为修改后的长度
+  if (key === 'length' && isArray(target)) {
+    depMap.forEach((dep, _key) => {
+      // 若修改的是长度且
+      if(_key >=(newValue as Number)){
+        add(dep)
+      }
+    })
+  }else{
+    // 普通对象
+    if(key !== undefined){
+      add(depMap.get(key))
+    }
+    // 数组通过索引修改
+    switch(type){
+      case TriggerOpTypes.ADD:
+        if(isArray(target) && isInteger(key)){
+          add(depMap.get('length'));
+        }
+        break;
+    }
+  }
+
+  effectSet.forEach((effect: any) => {
     effect();
   })
-  // let effects = depMap.get(key);
-  // if (!effects) {
-    
-  // }
-  // 如果有对应的key，则执行对应的effect
 }

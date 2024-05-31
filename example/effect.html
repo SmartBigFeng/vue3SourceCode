@@ -28,12 +28,16 @@
         state.name // 收集effect2
       })
       state.age // 收集的effect1
-      appNode.innerHTML = state.age;
+      appNode.innerHTML = `${state.age} ***** ${state.list[1]}  ***** ${state.list[10]} ******* ${state.list[11]} *******new key${state.alibaba}`;
     })
     // 只有使用的才会收集effect，address属性没有使用，就不会被收集
     setTimeout(() => {
       state.age = 1234  // 触发set，执行对应的effect
-      state.list[5] = 5
+      state.list.length=1;
+      state.list.shift()
+      state.list[10]= 996
+      state.list.push(11)
+      state.alibaba = 'alibaba'
     }, 1000)
   </script>
 </body>
