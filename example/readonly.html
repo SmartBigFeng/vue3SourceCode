@@ -1,0 +1,30 @@
+<!--
+ * @Author: 开发_王锋 wangfeng@vrgvtech.com
+ * @Date: 2024-05-31 11:12:15
+ * @LastEditors: 开发_王锋 wangfeng@vrgvtech.com
+ * @LastEditTime: 2024-05-31 15:29:42
+ * @FilePath: \ToG平台Web端-前端f:\CodeDemo\Vue\Vue3\vue3SourceCode\example\effect.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script src="../packages/reactivity/dist/reactivity.global.js"></script>
+  <script>
+    const { effect, readonly } = VueReactivity;
+    const readonlyState = readonly({ name: 1, age: 2, address: '北京', time: { hour: 1, minute: 2 } })
+    effect(() => {
+      readonlyState.time = {};
+      console.log(readonlyState.time) // 不会收集effect
+    })
+  </script>
+</body>
+
+</html>
